@@ -49,6 +49,4 @@ python client/client.py
 
 ---
 
-## Learning Reference
 
-Built while studying distributed systems concepts from MIT 6.824 and Designing Data-Intensive Applications (DDIA).# DeVault
