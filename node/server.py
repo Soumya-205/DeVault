@@ -9,7 +9,7 @@ def handle_client(conn, addr):
 
     while True:
         try:
-            data=conn.recv(1024).decode().strip().split('\n')[0]
+            data=conn.recv(1024).decode().strip()
             if not data:
                 break
 
