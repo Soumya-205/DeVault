@@ -79,7 +79,7 @@ python client/client.py
 |---|---|
 | Single node KV store | ✅ Done |
 | Interactive CLI client | ✅ Done |
-| Persistent connection | ✅ Done |
+| Persistent connection | ⏳ Upcoming |
 | Data persistence | ⏳ Upcoming |
 | Multi-node routing | ⏳ Upcoming |
 | Consistent hashing | ⏳ Upcoming |
