@@ -1,19 +1,36 @@
 import socket
 
-def send_command(command):
+def start_client():
+    #open ONE connection and keep it open
     client=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect(('localhost', 5000))
-    client.send(command.encode())
-    response=client.recv(1024).decode()
-    client.close()
-    return response
 
-#Testing all commands
-print(send_command("SET name Anamika"))
-print(send_command("SET age 20"))
-print(send_command("GET name"))
-print(send_command("GET age"))
-print(send_command("GET city"))
-print(send_command("EXISTS name"))
-print(send_command("DELETE name"))
-print(send_command("GET name"))
+    try:
+        client.connect(('localhost',5000))
+        print("Connect to DeVault. Type commands (SET, GET, DELETE, EXISTS) or EXIT to quit")
+
+        while True:
+            #take input from user
+            command=input("DeVault> ").strip()
+
+            #if user types EXIT, stop
+            if command.upper()=="EXIT":
+                print("Bye!")
+                break
+            #If user types nothing, skip
+            if not command:
+                continue
+
+            #Send the command to the server
+            client.send(command.encode())
+            #get response
+            response=client.recv(1024).decode().strip()
+            print(response)
+    
+    except ConnectionRefusedError:
+        print("Could not connect to DeVault. Is the server running?")
+    except Exception as e:
+        print(f"Error: {e}")
+    finally:
+        client.close()
+
+start_client()    

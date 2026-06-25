@@ -9,7 +9,7 @@ def handle_client(conn, addr):
 
     while True:
         try:
-            data=conn.recv(1024).decode().strip()
+            data=conn.recv(1024).decode().strip().split('\n')[0]
             if not data:
                 break
 
@@ -32,6 +32,7 @@ def handle_client(conn, addr):
             elif command=="DELETE":
                 key=parts[1]
                 if key in store:
+                    del store[key]
                     conn.send(b"DELETED\n")
                 else:
                     conn.send(b"NULL\n")
