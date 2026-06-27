@@ -81,6 +81,7 @@ python client/client.py
 | Interactive CLI client | ✅ Done |
 | Persistent connection | ✅ Done |
 | Data persistence | ✅ Done |
+| KEYS command + validation | ✅ Done |
 | Multi-node routing | ⏳ Upcoming |
 | Consistent hashing | ⏳ Upcoming |
 | Replication | ⏳ Upcoming |
