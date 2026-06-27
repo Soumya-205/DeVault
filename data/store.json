@@ -1,1 +1,5 @@
-{"name": "Alex", "city": "Mumbai"}
+{
+  "name": "Alex",
+  "city": "Mumbai",
+  "age": "21"
+}
