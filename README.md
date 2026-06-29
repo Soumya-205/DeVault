@@ -83,6 +83,6 @@ python client/client.py
 | Data persistence | ✅ Done |
 | KEYS command + validation | ✅ Done |
 | Multi-node routing | ✅ Done |
-| Consistent hashing | ⏳ Upcoming |
-| Replication | ✅ Done |
+| Consistent hashing | ✅ Done |
+| Replication | ⏳ Upcoming |
 | Fault tolerance | ⏳ Upcoming |
