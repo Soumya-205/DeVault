@@ -1,36 +1,49 @@
 import socket
 
-def start_client():
-    #open ONE connection and keep it open
+#Two nodes
+NODES=[
+    ('localhost', 5000),
+    ('localhost', 5001)
+]
+
+def get_node(key):
+    """Decide which node handles this key."""
+    index=hash(key)%len(NODES)
+    return NODES[index]
+
+def send_command(host, port, command):
+    """Send a command to a specific node"""
     client=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.connect((host, port))
+    client.send(command.encode())
+    response=client.recv(1024).decode().strip()
+    client.close()
+    return response
 
-    try:
-        client.connect(('localhost',5000))
-        print("Connect to DeVault. Type commands (SET, GET, DELETE, EXISTS) or EXIT to quit")
+def start_client():
+    print("Connected to DeVault cluster.")
+    print("Commands: SET key value | GET key | EXISTS key | EXIT")
 
-        while True:
-            #take input from user
-            command=input("DeVault> ").strip()
+    while True:
+        command=input("DeVault> ").strip()
 
-            #if user types EXIT, stop
-            if command.upper()=="EXIT":
-                print("Bye!")
-                break
-            #If user types nothing, skip
-            if not command:
-                continue
+        if command.upper()=="EXIT":
+            print("BYE!")
+            break;
+        
+        if not command:
+            continue
 
-            #Send the command to the server
-            client.send(command.encode())
-            #get response
-            response=client.recv(1024).decode().strip()
+        parts=command.split()
+        cmd=parts[0].upper()
+
+        #for key-based commands, route to correct node
+        if cmd in ("SET", "GET", "DELETE", "EXISTS") and len(parts)>=2:
+            key=parts[1]
+            host, port=get_node(key)
+            print(f" ->Routing to Node on port {port}")
+            response=send_command(host, port, command)
             print(response)
-    
-    except ConnectionRefusedError:
-        print("Could not connect to DeVault. Is the server running?")
-    except Exception as e:
-        print(f"Error: {e}")
-    finally:
-        client.close()
-
-start_client()    
+        else:
+            print("ERROR: Unknown command or missing key")
+start_client()

@@ -93,11 +93,16 @@ def handle_client(conn, addr):
     print(f"Disconnected: {addr}")
 
 #-----start server----------------------------
+import sys
+
+PORT=int(sys.argv[1]) if len(sys.argv)>1 else 5000
+DATA_FILE=f"data/store_{PORT}.json"
+
 server=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-server.bind(('localhost', 5000))
+server.bind(('localhost', PORT))
 server.listen(5)
-print("DeVault running on port 5000...")
+print(f"DeVault Node running on port {PORT}...")
 
 while True:
     conn, addr=server.accept()
