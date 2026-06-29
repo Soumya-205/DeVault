@@ -84,5 +84,5 @@ python client/client.py
 | KEYS command + validation | ✅ Done |
 | Multi-node routing | ✅ Done |
 | Consistent hashing | ⏳ Upcoming |
-| Replication | ⏳ Upcoming |
+| Replication | ✅ Done |
 | Fault tolerance | ⏳ Upcoming |
