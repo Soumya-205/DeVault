@@ -82,7 +82,7 @@ python client/client.py
 | Persistent connection | ✅ Done |
 | Data persistence | ✅ Done |
 | KEYS command + validation | ✅ Done |
-| Multi-node routing | ⏳ Upcoming |
+| Multi-node routing | ✅ Done |
 | Consistent hashing | ⏳ Upcoming |
 | Replication | ⏳ Upcoming |
 | Fault tolerance | ⏳ Upcoming |
