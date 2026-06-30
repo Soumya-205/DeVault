@@ -7,11 +7,13 @@ from node.consistent_hash import ConsistentHash
 ring=ConsistentHash(replicas=3)
 ring.add_node("localhost:5000")
 ring.add_node("localhost:5001")
+ring.add_node("localhost:5002")
 
 #Map node name to actual connection details
 NODE_MAP={
     "localhost:5000": ("localhost", 5000),
-    "localhost:5001": ("localhost", 5001)
+    "localhost:5001": ("localhost", 5001),
+    "localhost:5002": ("localhost", 5002)
 }
 
 def get_node(key):
