@@ -22,13 +22,21 @@ def get_node(key):
     return NODE_MAP[node_name]
 
 def send_command(host, port, command):
-    """Send the command to specific node."""
-    client=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect((host, port))
-    client.send(command.encode())
-    response=client.recv(1024).decode().strip()
-    client.close()
-    return response
+    """Send the command to specific node. Return None if node is unreachable"""
+    try:
+        client=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client.settimeout(2)
+        client.connect((host, port))
+        client.send(command.encode())
+        response=client.recv(1024).decode().strip()
+        client.close()
+        return response
+    except ConnectionRefusedError:
+        return f"ERROR: Node on port {port} is offline."
+    except socket.timeout:
+        return f"ERROR: Node on port {port} timed out."
+    except Exception as e:
+        return f"ERROR: {e}"
 
 def start_client():
     print("Connected to DeVault cluster (Consistent Hashing enabled).")

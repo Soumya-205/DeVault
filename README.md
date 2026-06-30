@@ -85,5 +85,6 @@ python client/client.py
 | Multi-node routing | ✅ Done |
 | Consistent hashing | ✅ Done |
 | Three-node cluster | ✅ Done |
+| Graceful failure handling | ✅ Done |
 | Replication | ⏳ Upcoming |
 | Fault tolerance | ⏳ Upcoming |
