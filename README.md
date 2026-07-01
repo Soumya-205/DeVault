@@ -86,5 +86,5 @@ python client/client.py
 | Consistent hashing | ✅ Done |
 | Three-node cluster | ✅ Done |
 | Graceful failure handling | ✅ Done |
-| Replication | ⏳ Upcoming |
+| Replication | ✅ Done |
 | Fault tolerance | ⏳ Upcoming |
