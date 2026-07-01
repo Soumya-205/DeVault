@@ -20,6 +20,18 @@ def save_store():
     with open(DATA_FILE,'w')as f:
         json.dump(store,f,indent=2)
 
+def replicate_to_backup(command):
+    """Forward a write command to the backup node."""
+    try:
+        backup=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        backup.settimeout(2)
+        backup.connect(('localhost', BACKUP_PORT))
+        backup.send(f"REPLICATE {command}".encode())
+        backup.recv(1024)
+        backup.close()
+    except Exception as e:
+        print(f"Replication to {BACKUP_PORT} failed: {e}")
+
 #----Load data on startup------------------
 store=load_store()
 print(f"Loaded {len(store)} keys from disk")
@@ -39,6 +51,20 @@ def handle_client(conn, addr):
 
             command=parts[0].upper()
 
+            #Handle replicated commands from another node
+            if command=="REPLICATE":
+                parts=parts[1:] 
+                command=parts[0].upper()
+                if command=="SET" and len(parts)>=3:
+                    store[parts[1]]=parts[2]
+                    save_store()
+                elif command=="DELETE" and len(parts)>=2:
+                    if parts[1] in store:
+                        del store[parts[1]]
+                        save_store()
+                conn.send(f"REPLICATED\n".encode())
+                continue
+
             if command=="SET":
                if len(parts)<3:
                    conn.send(b"ERROR: Usage: SET key value\n")
@@ -46,6 +72,7 @@ def handle_client(conn, addr):
                key, value=parts[1], parts[2]
                store[key]=value
                save_store()
+               replicate_to_backup(f"SET {key} {value}")
                conn.send(b"Ok\n")
 
             elif command=="GET":
@@ -64,6 +91,7 @@ def handle_client(conn, addr):
                 if key in store:
                     del store[key]
                     save_store()
+                    replicate_to_backup(f"DELETE {key}")
                     conn.send(b"DELETED\n")
                 else:
                     conn.send(b"NULL\n")
@@ -97,6 +125,13 @@ import sys
 
 PORT=int(sys.argv[1]) if len(sys.argv)>1 else 5000
 DATA_FILE=f"data/store_{PORT}.json"
+
+#Define which node this oe replicates to
+ALL_PORTS=[5000, 5001, 5002]
+my_index=ALL_PORTS.index(PORT)
+BACKUP_PORT=ALL_PORTS[(my_index + 1)% len(ALL_PORTS)]
+
+print(f"This node ({PORT}) replicates to port {BACKUP_PORT}")
 
 server=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
