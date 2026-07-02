@@ -21,6 +21,15 @@ def get_node(key):
     node_name=ring.get_node(key)
     return NODE_MAP[node_name]
 
+def get_backup_node(key):
+    """Get the backup node for a key."""
+    node_name=ring.get_node(key)
+    #find next node in the ring as backup
+    all_nodes=list(NODE_MAP.keys())
+    current_index=all_nodes.index(node_name)
+    backup_name=all_nodes[(current_index +1)% len(all_nodes)]
+    return NODE_MAP[backup_name]
+
 def send_command(host, port, command):
     """Send the command to specific node. Return None if node is unreachable"""
     try:
@@ -59,6 +68,13 @@ def start_client():
             host, port=get_node(key)
             print(f" -> Routing to Node on port {port}")
             response=send_command(host, port, command)
+
+            #if primary failed and this is a GET then try backup
+            if "timed out" in response or "offline" in response:
+                if cmd=="GET":
+                    backup_host, backup_port=get_backup_node(key)
+                    print(f" -> Primary down, retrying on backup port {backup_port}")
+                    response=send_command(backup_host, backup_port, command)
             print(response)
 
         else:

@@ -1,6 +1,3 @@
 {
-  "name": "Alex",
-  "city": "Mumbai",
-  "age": "21",
-  "job": "Doctor"
+  "address": "123 Main Street"
 }

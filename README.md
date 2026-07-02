@@ -87,4 +87,10 @@ python client/client.py
 | Three-node cluster | ✅ Done |
 | Graceful failure handling | ✅ Done |
 | Replication | ✅ Done |
-| Fault tolerance | ⏳ Upcoming |
+| Read failover to backup node | ✅ Done |
+| Write failover to bakup node | ⏳ Upcoming |
+| Heartbeat between nodes | ⏳ Upcoming |
+| Automatic failure detection | ⏳ Upcoming |
+| Node Recovery and Sync | ⏳ Upcoming |
+| REST API | ⏳ Upcoming |
+| Web dashboard | ⏳ Upcoming |

@@ -2,9 +2,16 @@ import socket
 import threading
 import json
 import os
+import sys
 
 #---config----------
-DATA_FILE="data/store.json"
+PORT=int(sys.argv[1]) if len(sys.argv)>1 else 5000
+DATA_FILE=f"data/store_{PORT}.json"
+
+#Define which node this one replicates to
+ALL_PORTS=[5000, 5001, 5002]
+my_index=ALL_PORTS.index(PORT)
+BACKUP_PORT=ALL_PORTS[(my_index + 1)% len(ALL_PORTS)]
 
 #-----Persistence---------
 def load_store():
@@ -35,6 +42,7 @@ def replicate_to_backup(command):
 #----Load data on startup------------------
 store=load_store()
 print(f"Loaded {len(store)} keys from disk")
+print(f"This node ({PORT}) replicates to port {BACKUP_PORT}")
 
 #----Client Handler------------------------
 def handle_client(conn, addr):
@@ -56,7 +64,7 @@ def handle_client(conn, addr):
                 parts=parts[1:] 
                 command=parts[0].upper()
                 if command=="SET" and len(parts)>=3:
-                    store[parts[1]]=parts[2]
+                    store[parts[1]]=" ".join(parts[2:])
                     save_store()
                 elif command=="DELETE" and len(parts)>=2:
                     if parts[1] in store:
@@ -69,7 +77,8 @@ def handle_client(conn, addr):
                if len(parts)<3:
                    conn.send(b"ERROR: Usage: SET key value\n")
                    continue
-               key, value=parts[1], parts[2]
+               key=parts[1]
+               value=" ".join(parts[2:]) #join everything after key as value
                store[key]=value
                save_store()
                replicate_to_backup(f"SET {key} {value}")
@@ -81,7 +90,10 @@ def handle_client(conn, addr):
                     continue
                 key=parts[1]
                 value=store.get(key, None)
-                conn.send(f"{value}\n" .encode() if value else b"NULL\n")
+                if value is not None:
+                    conn.send(f"{value}\n" .encode())
+                else:
+                    conn.send(b"NULL\n")
 
             elif command=="DELETE":
                 if len(parts)<2:
@@ -121,18 +133,6 @@ def handle_client(conn, addr):
     print(f"Disconnected: {addr}")
 
 #-----start server----------------------------
-import sys
-
-PORT=int(sys.argv[1]) if len(sys.argv)>1 else 5000
-DATA_FILE=f"data/store_{PORT}.json"
-
-#Define which node this oe replicates to
-ALL_PORTS=[5000, 5001, 5002]
-my_index=ALL_PORTS.index(PORT)
-BACKUP_PORT=ALL_PORTS[(my_index + 1)% len(ALL_PORTS)]
-
-print(f"This node ({PORT}) replicates to port {BACKUP_PORT}")
-
 server=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server.bind(('localhost', PORT))
